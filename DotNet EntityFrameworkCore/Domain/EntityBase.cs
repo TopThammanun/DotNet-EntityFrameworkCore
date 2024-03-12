@@ -4,9 +4,9 @@ namespace DotNet_EntityFrameworkCore.Domain
 {
     public interface IModifyTrackingEntity
     {
-        string CREATED_BY { get; set; }
-        DateTime? CREATED_DATE { get; set; }
-        string UPDATED_BY { get; set; }
+        string? CREATED_BY { get; set; }
+        DateTime CREATED_DATE { get; set; }
+        string? UPDATED_BY { get; set; }
         DateTime? UPDATED_DATE { get; set; }
     }
 
@@ -19,9 +19,9 @@ namespace DotNet_EntityFrameworkCore.Domain
 
     public abstract class EntityBase : IModifyTrackingEntity
     {
-        public string CREATED_BY { get; set; }
-        public DateTime? CREATED_DATE { get; set; }
-        public string UPDATED_BY { get; set; }
+        public string? CREATED_BY { get; set; }
+        public DateTime CREATED_DATE { get; set; }
+        public string? UPDATED_BY { get; set; }
         public DateTime? UPDATED_DATE { get; set; }
     }
 

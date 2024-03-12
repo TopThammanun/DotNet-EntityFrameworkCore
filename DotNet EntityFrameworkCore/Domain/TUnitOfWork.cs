@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 using DotNet_EntityFrameworkCore.DataCore;
 using DotNet_EntityFrameworkCore.Domain;
-using DotNet_EntityFrameworkCore.Domain.Repository;
+using HealthTeam.PCU.Microservice.Domain;
 
-namespace HealthTeam.PCU.Microservice.Domain
+namespace DotNet_EntityFrameworkCore.Domain
 {
     public interface ITUnitOfWork : IUnitOfWork
     {
         Task<int> SaveWithoutTracking();
-        IMstPlanRepository MstPlanRepository { get; }
+        IGenderRepository GenderRepository { get; }
     }
 
     public class TUnitOfWork : UnitOfWork, ITUnitOfWork
@@ -26,11 +26,11 @@ namespace HealthTeam.PCU.Microservice.Domain
             return await this.dBContext.SaveWithoutChangeModDataAsync();
         }
 
-        public IMstPlanRepository MstPlanRepository { get; private set; }
+        public IGenderRepository GenderRepository { get; private set; }
 
         protected override void InitialRepositories(IDBContext dbContext)
         {
-            MstPlanRepository = new MstPlanRepository(dbContext);
+            GenderRepository = new GenderRepository(dbContext);
         }
 }
 }

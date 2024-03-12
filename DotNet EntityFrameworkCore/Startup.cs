@@ -1,7 +1,6 @@
 ﻿using DotNet_EntityFrameworkCore.Core;
 using DotNet_EntityFrameworkCore.Domain;
 using DotNet_EntityFrameworkCore.WebAPICore;
-using HealthTeam.PCU.Microservice.Domain;
 using System.ComponentModel;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using AutoMapper;
+using DotNet_EntityFrameworkCore.DataCore;
+using DotNet_EntityFrameworkCore.Service;
 
 namespace DotNet_EntityFrameworkCore
 {
@@ -37,16 +38,6 @@ namespace DotNet_EntityFrameworkCore
             {
                 option.MinimumSameSitePolicy = SameSiteMode.None;
                 option.Secure = CookieSecurePolicy.Always;
-            });
-            services.AddCors(options =>
-            {
-                var corsHosts = AppSettings.Get<string>("CORSAllowedHost").Split(";");
-                options.AddPolicy("CORSAllowLocalHost3000", builder =>
-                    builder.SetIsOriginAllowed(url => corsHosts.Contains(new Uri(url).Host, StringComparer.OrdinalIgnoreCase) || corsHosts.Contains("*"))
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                 );
             });
 
             services
@@ -69,12 +60,11 @@ namespace DotNet_EntityFrameworkCore
             services.AddSingleton<ServiceInfo>(new ServiceInfo("01", "PCU Microservice", null, environment));
 
             services.AddDbContext<ITDBContext, TDBContext>();
-        /*    services.AddSingleton<IDbModelConfigure, DBConfigure>();*/
-            services.AddScoped<ITUnitOfWork, TUnitOfWork>();
+            services.AddSingleton<IDbModelConfigure, DBConfigure>();
+            services.AddScoped<TUnitOfWork, TUnitOfWork>();
 
-      /*      services.AddScoped<IAccountService, AccountService>();*/
+            services.AddScoped<IPlanService, PlanService>();
             services.AddHealthChecks();
-            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
@@ -95,23 +85,10 @@ namespace DotNet_EntityFrameworkCore
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
-                app.UseSwagger(c =>
+                app.UseSwaggerUI(c =>
                 {
-                    c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
-                    {
-                        if (httpReq.Headers.ContainsKey("referer"))
-                        {
-                            string basePath = httpReq.Headers["referer"].ToString().Replace("/swagger/index.html", "");
-                            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = basePath } };
-                        }
-                        else
-                        {
-                            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
-                        }
-                    });
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API Name");
                 });
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("v1/swagger.json", "PCC.PCCMicroservice v1"));
             }
 
             SessionData.Init(() =>

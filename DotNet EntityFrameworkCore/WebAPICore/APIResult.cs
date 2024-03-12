@@ -12,7 +12,6 @@ namespace DotNet_EntityFrameworkCore.WebAPICore
     {
         public int Status { get; set; }
         public bool Success { get; set; }
-        public string Version { get; set; } = AppSettings.Get<string>("Version");
         public object Data { get; set; }
     }
 
